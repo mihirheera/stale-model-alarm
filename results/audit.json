@@ -1,0 +1,92 @@
+{
+  "E1_validation": {
+    "raw_rows": 899164,
+    "raw_columns": 27,
+    "duplicate_loan_ids": 0,
+    "mis_status_counts": {
+      "P I F": 739609,
+      "CHGOFF": 157558,
+      "MISSING": 1997
+    },
+    "rows_missing_fy": 0,
+    "max_approval_date": "2014-06-25",
+    "max_disbursement_date": "2014-12-31",
+    "max_chgoff_date": "2014-08-29",
+    "fy_matches_oct_sep_rule_share": 1.0,
+    "pif_with_chgoff_date": 4927,
+    "chgoff_without_chgoff_date": 47
+  },
+  "E2_term_audit": {
+    "cohorts_used": "FY1990-FY2000, terms 1-239 months",
+    "n_loans": 254890,
+    "default_rate_round_terms": 0.008284130166332535,
+    "default_rate_odd_terms": 0.29588656618491316,
+    "share_of_loans_with_odd_terms": 0.21526540860763466,
+    "by_bucket": {
+      "(0, 36] | odd": {
+        "n": 11733,
+        "default_rate": 0.478
+      },
+      "(0, 36] | round (x12)": {
+        "n": 14182,
+        "default_rate": 0.036
+      },
+      "(36, 60] | odd": {
+        "n": 6960,
+        "default_rate": 0.517
+      },
+      "(36, 60] | round (x12)": {
+        "n": 46864,
+        "default_rate": 0.008
+      },
+      "(60, 84] | odd": {
+        "n": 11327,
+        "default_rate": 0.238
+      },
+      "(60, 84] | round (x12)": {
+        "n": 66207,
+        "default_rate": 0.005
+      },
+      "(84, 120] | odd": {
+        "n": 12803,
+        "default_rate": 0.156
+      },
+      "(84, 120] | round (x12)": {
+        "n": 45510,
+        "default_rate": 0.005
+      },
+      "(120, 239] | odd": {
+        "n": 12046,
+        "default_rate": 0.194
+      },
+      "(120, 239] | round (x12)": {
+        "n": 27258,
+        "default_rate": 0.008
+      }
+    },
+    "default_rate_term_exactly_84": 0.0028122914614382407,
+    "default_rate_term_83": 0.1033434650455927,
+    "n_term_83": 987,
+    "chargeoffs_where_term_within_3m_of_months_run": 0.037769683384701595,
+    "corr_term_vs_months_run_chargeoffs": 0.05087906756559164
+  },
+  "E3_maturity": {
+    "cohorts_used": "FY1995-FY2000 charge-offs",
+    "n": 16089,
+    "years_from_disbursement_to_chargeoff": {
+      "p25": 3.72,
+      "p50": 5.63,
+      "p75": 7.77,
+      "p80": 8.35,
+      "p90": 10.0
+    },
+    "share_of_chargeoffs": {
+      "within_1y": 0.004,
+      "within_2y": 0.049,
+      "within_3y": 0.155,
+      "within_4y": 0.291,
+      "within_5y": 0.419,
+      "within_7y": 0.68
+    }
+  }
+}
