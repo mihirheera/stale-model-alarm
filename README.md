@@ -20,7 +20,8 @@ A model-review tool for a **credit-risk analyst at a community bank**.
 - **In:** a year's loan applications (amount, SBA guarantee share, employees, industry, state, ...).
 - **Out:** a default risk for each loan (AI model 1), and a yearly **drift status** (AI model 2) saying whether
   applicants still look like the ones model 1 learned from, and *which* details changed.
-- **[Interactive dashboard](dashboard/index.html):** replay FY2004–2010 one year at a time. Each year shows a status
+- **[Interactive dashboard](https://mihirheera.github.io/stale-model-alarm/dashboard/index.html)** (live link; source in
+  `dashboard/`): replay FY2004–2010 one year at a time. Each year shows a status
   (no drift / drift, model stable / drift, model deteriorated / too early to judge), the numbers, and two real
   example loans going in and a risk score coming out.
 - It never approves or rejects a loan. It tells a person when to review the model.

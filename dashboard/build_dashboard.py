@@ -30,6 +30,7 @@ data = {
     "impact": results["E9_financial_impact"],
     "examples": results["E10_examples"],
     "sectors": SECTOR_NAMES,
+    "n_raw": json.loads((ROOT / "results" / "audit.json").read_text())["E1_validation"]["raw_rows"],
 }
 
 TEMPLATE = (Path(__file__).parent / "template.html").read_text()
