@@ -1,7 +1,7 @@
 # Stale Model Alarm
 
 **Track:** Finance
-**Team:** Mihir Heera, Owen Garabedian
+**Team:** Mihir Heera
 
 > This project is a prototype and is not financial advice.
 
@@ -47,11 +47,16 @@ Only approval-day information is used. Three problems were found and handled:
 
 **Model 1 (default risk).** Gradient boosting trained on FY2001–02 (81,624 loans), calibrated on FY2003, tested on
 FY2004–10. **Baselines:** the average default rate for everyone; an industry lookup table. Logistic regression is
-the comparison.
+the comparison. *Why gradient boosting:* it is a strong, standard choice for tables that mix numbers and categories,
+trains in seconds on a laptop, and is easy to inspect. Our question is about monitoring, not squeezing out accuracy.
 
 **Model 2 (drift).** For each year, a classifier tries to tell that year's applications from FY2001–03 ones, with no
 outcomes. Its AUC is the drift score. The alarm fires above the most that normal years differed from each other (0.695).
 **Baselines:** PSI, the banking industry's standard drift check, and a "label monitor" that counts early defaults.
+*Why adversarial validation:* PSI checks one detail at a time, while this looks at all of them together. It needs
+no repayment data, so it can run as soon as loans are approved. *Why FY2001–03 and not just FY2001–02:* the finished
+model was built from all three years (trained on FY2001–02, calibrated on FY2003), and setting the threshold from
+normal years needs at least three of them.
 
 ## Results
 Every number is on years the models never trained on; 95% bootstrap intervals are in `results/results.json`.
@@ -79,8 +84,9 @@ Every number is on years the models never trained on; 95% bootstrap intervals ar
   true.
 - **No lead time.** The simple label monitor also first fired in FY2005, so the alarm was *as fast as* counting early
   defaults, not faster. Its advantages are that it needs no outcomes and explains what changed.
-- **False alarms and misses.** It gave 1 false alarm in 3 among normal years, and missed FY2004's mild under-estimate
-  (1.21×). It misses about 4 in 10 defaults every year. By FY2010 it was no better than the industry rule (AUC 0.50
+- **False alarms and close calls.** It gave 1 false alarm in 3 among normal years. That year, FY2003, also sets the
+  0.695 alarm line, and FY2004 (0.677) fell just under it. FY2004 had 1.21× the expected defaults; under our rule
+  (>1.25×) that is not a failure, but under a stricter one it would be a miss. Model 1 misses about 4 in 10 defaults every year. By FY2010 it was no better than the industry rule (AUC 0.50
   vs. 0.55).
 - **Drift is not failure.** Drift keeps rising in FY2009–10 while default rates fall. Some drift is SBA program
   changes, not riskier borrowers.

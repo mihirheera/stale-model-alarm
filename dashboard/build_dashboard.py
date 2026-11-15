@@ -25,6 +25,7 @@ data = {
     "brier": {name: {fy: v["brier"] for fy, v in m["by_year"].items()} for name, m in results["E4_models"].items()},
     "ci": results["E4_models"]["Gradient boosting"]["by_year"],
     "label_monitor": results["label_monitor"]["lag2"]["by_monitor_year"],
+    "label_threshold": results["label_monitor"]["lag2"]["threshold"],
     "term_leak": results["E7_robustness"]["term_leak_demo"],
     "config": results["config"],
     "impact": results["E9_financial_impact"],
