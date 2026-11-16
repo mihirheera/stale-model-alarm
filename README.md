@@ -102,7 +102,7 @@ Every figure is for years never used in training or calibration.
 - Methods: adversarial validation (Lopez-Paz & Oquab, ICLR 2017); PSI (credit-risk practice).
 - Libraries: pandas, NumPy, scikit-learn, matplotlib, kagglehub, pytest, Chart.js.
 - AI tools: **Claude Code (Anthropic; Claude Opus 5.5, Sonnet 5.5 and Fable 5.2)** helped develop and research the
-  idea, helped write the code, run the analysis, and draft the documentation and dashboard, all under my close direction and review.
+  idea, wrote the code, ran the analysis, and drafted the documentation and dashboard, under my close direction and review.
   No pretrained models are used.
 
 ---
