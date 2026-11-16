@@ -12,7 +12,7 @@ Every research choice that could change a result, why it was made, and the evide
 | D5 | FY2003 is used only to choose the decision threshold and to calibrate probabilities. | Calibration must only use information available before the test years. | Test years 2004+ never influence any model setting. |
 | D6 | Fix two-digit-year dates (e.g. '68' was read as 2068). | Max approval date was 2068 before the fix. | Affects dates only (approval/disbursement/charge-off), not fiscal year. |
 | D7 | Codes other than Y/N in `RevLineCr` and `LowDoc` → "unknown", not guessed. | Li et al. call them data-entry errors. | Their changing share over time is a *recording* change; robustness check E7 reruns drift without these fields. |
-| D8 | The `LowDoc` program shows 0% use from FY2006. | `results/cohorts.csv`. | A genuine policy change, not an economic one. Reported separately so it is not mistaken for borrower risk. |
+| D8 | The `LowDoc` program shows 0% use from FY2006. | `results/cohorts.csv`. | A real policy change, not an economic one. Reported separately so it is not mistaken for borrower risk. |
 
 Later documentation audit (2026-11-15, no change to code logic or results): wording corrected so that Term is described as suspected contamination, dollar figures as gross charge-offs, and the leave-one-out "1 false alarm in 3" as a property of the threshold rule rather than a measured rate. A clean clone reproduced `results.json` exactly.
 

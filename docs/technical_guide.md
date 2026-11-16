@@ -31,8 +31,8 @@ risk, the training average; (b) look up the industry's past default rate.
 the defaulted one the higher risk score. 0.5 = coin flip, 1.0 = perfect. It measures **ranking**, not whether the
 percentages are right.
 
-**Precision and recall.** Of the loans the model *flagged*, precision is the share that really defaulted. Of the loans
-that *really defaulted*, recall is the share the model flagged. They trade off: flag more loans and you catch more
+**Precision and recall.** Of the loans the model *flagged*, precision is the share that defaulted. Of the loans
+that *did default*, recall is the share the model flagged. They trade off: flag more loans and you catch more
 defaults (recall up) but also flag more good loans (precision down).
 
 **Brier score.** The average of (predicted probability − what happened)². Lower is better. It punishes confident wrong
@@ -67,7 +67,7 @@ while the borrowers look the same. So the alarm means "**review the model**", no
   model never sees the future.
 - **Alarm threshold set from normal years only.** I measured how different the normal years (2001, 2002, 2003) were from
   *each other*. The alarm fires only if a new year is more different than that. Nothing after 2003 was used.
-- **"Did the model really get worse?"** I decide this in hindsight, using how the loans actually turned out:
+- **"Did the model get worse?"** I decide this in hindsight, using how the loans actually turned out:
   deteriorated = more than 25% more defaults than expected, or AUC down by 0.05 or more.
 - **Compared with a simpler alarm.** A bank could also just count how many loans from 2 years ago have already
   defaulted (the "label monitor"). My alarm has to be at least as useful as that.

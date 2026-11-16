@@ -1,47 +1,44 @@
-# Two-minute demo script
+# Demo video
 
-Follows the official structure: problem 15 s · demo 60 s · how it works 30 s · next steps 15 s.
-About 270 spoken words; read at a steady 135 words a minute. Every number is in `results/results.json` and visible on
-the dashboard at the moment it is spoken.
+**Video:** https://youtu.be/Q_YpQ6imcLw (1:59). Recorded voice-over by Mihir Heera; the dashboard walkthrough was
+screen-recorded with Playwright, synced to the spoken words, and edited with FFmpeg. Captions file:
+`video/stale_model_alarm_demo.srt` (kept outside the repository).
 
-**Before recording:** open
-https://mihirheera.github.io/stale-model-alarm/dashboard/index.html?fy=2004 in Chrome (window at least 1,280 px wide,
-100% zoom) and wait for the charts to load. The year buttons and the section menu stay pinned to the top.
+Structure follows the official guide: problem, demo, how it works, next steps.
 
-| Time | On screen (exact action) | Voiceover |
+| Time | On screen | Said |
 |---|---|---|
-| 0:00–0:15 **Problem** | Top of the page, FY2004 selected. Do not click. | "A community bank's credit-risk analyst relies on a model trained on past loans. But defaults only show up years later, so the model can go out of date unnoticed. Stale Model Alarm helps the analyst check." |
-| 0:15–0:32 **Demo** | Move the pointer along the intro line under the header, then the header text "risk model trained FY2001–2002". | "This dashboard replays real SBA small-business loans. Model one, trained on 2001 and 2002, predicts each loan's default risk. Model two compares application forms only: do this year's applicants still resemble the ones model one was built from?" |
-| 0:32–0:46 | Click **FY2005**. The status panel turns red (CRITICAL). Point at the **Drift score 0.816** cell ("threshold 0.695; above by 0.121"). | "I select fiscal year 2005. The status turns critical: the drift score is 0.816, above the 0.695 alarm line set from earlier years only. No repayment data was needed." |
-| 0:46–0:54 | Point at **Predicted default rate 16.4%**, then **Observed default rate 25.3%**. | "Years later, the outcomes arrived: the model predicted 16.4 percent would default; 25.3 percent did." |
-| 0:54–1:06 | Click **Evidence** in the menu. Point at "Applicant characteristics that changed": SBA guarantee share, Revolving-credit flag. | "The evidence shows what changed most: the SBA guarantee share and how credit lines were recorded. That is a reason to review the model, not proof of higher risk." |
-| 1:06–1:15 | Click **Loans**. Point at the left card: $50,000, MODEL PREDICTION 12.6%, HISTORICAL OUTCOME Charged off. | "One real loan: fifty thousand dollars, scored 12.6 percent, not flagged. It was charged off." |
-| 1:15–1:45 **How it works** | Click **Performance**: point at the AUC chart (dark model line above the grey industry-rule line, FY2004–07). At "Model two", click **Drift** to show the two method panels. | "Model one is gradient boosting on thirteen application details. On years it never saw, 2004 to 2007, it ranked loans better than both simple baselines: AUC 0.62 to 0.66, against about 0.53 for an industry lookup table and 0.5 for the average rate. But its percentages fell far behind. Model two is a second classifier, checked against the standard PSI test and a simple count of early defaults." |
-| 1:45–2:00 **Next steps** | Click **Limitations**. Leave "No earlier warning has been shown" and "The alert threshold is preliminary" on screen. | "The main limitation: that simple default count also first fired in 2005, so my alarm was not earlier, and its threshold rests on three reference years. Next, I would test newer SBA data. This is a prototype, not financial advice." |
+| 0:00 | Full screen: Mihir, introduction (captions on) | "Hi, my name is Mihir Heera and I built the Stale Model Alarm. Now, modern day community banks use AI to predict whether small business loans will actually be repaid. But when the economy inevitably changes, new applicants may look very different from borrowers that the model is trained on. This can make the model's predictions way less reliable." |
+| 0:21 | Dashboard, top of page, FY2004 selected; Mihir in the corner from here on | "Now this is Stale Model Alarm, a tool that helps financial analysts monitor changes in their credit risk models." |
+| 0:28 | Cursor moves to FY2005 and clicks it; status turns CRITICAL | "First, let's look at fiscal year 2005. The dashboard compares the model's predicted loan defaults with the actual results." |
+| 0:36 | Drift score cell (0.816) outlined | "It also checks whether the characteristics of new applicants have changed." |
+| 0:39 | CRITICAL status panel outlined | "Here, our system detects a major shift in the applicant population and raises an alarm." |
+| 0:45 | Evidence section: applicant characteristics that changed | "It also identifies which characteristics changed, helping analysts understand what may be affecting their model. For example, changes in loan size, credit line usage, and SBA guarantee percentages helped explain this shift." |
+| 0:58 | Strength of the evidence panel (Link: not established) | "An alarm does not automatically mean borrowers are riskier." |
+| 1:01 | Actions section: Critical row highlighted | "It just tells analysts that they should investigate whether their existing model is still reliable." |
+| 1:07 | Method section: stream 1 (credit-risk model) | "We used historical US Small Business Administration loan data and we trained our credit risk model on earlier loans and tested it on later years that had never seen before." |
+| 1:17 | Method section: stream 2 (population monitor) | "We also built a second machine learning model to detect changes in applicant characteristics." |
+| 1:22 | Performance section: AUC chart, cursor over FY2004 to FY2007 | "From fiscal year 2004 to fiscal year 2007, our model achieved AUC scores of 0.62 to 0.66 compared with 0.53 and 0.54 for an industry-based baseline." |
+| 1:35 | Limitations: "No earlier warning has been shown" | "Our system first raised an alarm in fiscal year 2005, the same year as a simpler default monitoring method. While we may not have shown an earlier warning, our approach adds a different signal," |
+| 1:46 | Drift section: adversarial validation panel, then the SBA guarantee share comparison | "it detects changes in applicants and helps explain what is driving them." |
+| 1:50 | Limitations: "Outcomes are incomplete", then "One dataset, in hindsight" | "One limitation is that historical loan outcomes are incomplete. And looking forward, we want to test our system with newer lending data and across different economic conditions." |
 
-**If it runs long:** drop "and 0.5 for the average rate" (about 3 seconds).
-
-## Fact check
-| Spoken claim | Source in `results/results.json` | Value |
+## Fact check of spoken claims
+| Claim | Source in `results/results.json` | Value |
 |---|---|---|
-| Trained on 2001 and 2002 | `config.train_years` | [2001, 2002]; 81,624 loans |
-| FY2005 status critical | `E6_early_warning.table` | "Drift detected, performance has deteriorated" |
-| Drift score 0.816; alarm line 0.695 | `E5_drift.test_years.2005.adv_auc`; `E5_drift.adv_threshold` | 0.816; 0.695 (largest of FY2001 0.671, FY2002 0.586, FY2003 0.695) |
-| Predicted 16.4%, observed 25.3% | `E6` table, FY2005 | 0.164; 0.253 |
-| What changed most | `E5_drift.test_years.2005.top_features` | SBA guarantee share 0.162, revolving-credit flag 0.115 |
-| $50,000 loan, 12.6%, not flagged, charged off | `E10_examples.by_year.2005.missed_default` | $50,000; 0.126 (cut-off 0.170) |
-| Thirteen application details | `config.features` | 13 |
-| AUC 0.62–0.66 vs. about 0.53 and 0.5 | `E4_models` FY2004–07 | model 0.618–0.664; industry rule 0.525–0.543; average rate 0.500 |
-| Percentages fell far behind | `E6` table `calib_ratio` | 1.21 → 2.44 |
-| Default count also first fired in 2005 | `E6.summary` | drift 2005; label monitor 2005; PSI 2005 |
-| Three reference years | `E5_drift.normal_years` | FY2001, FY2002, FY2003 |
+| FY2005: alarm raised | `E6_early_warning.table` | drift score 0.816 > threshold 0.695 |
+| What changed: loan size, credit line, SBA guarantee share | `E5_drift.test_years.2005.top_features` | SBA guarantee share 0.162, revolving-credit flag 0.115, loan size 0.063 |
+| Trained on earlier loans, tested on later unseen years | `config` | train FY2001–02, calibrate FY2003, test FY2004–10 |
+| AUC 0.62 to 0.66 vs. 0.53 and 0.54 (industry rule), FY2004–07 | `E4_models` | model 0.618–0.664; industry rule 0.525–0.543 |
+| First alarm in FY2005, same year as a simpler default monitor | `E6_early_warning.summary` | first drift alarm 2005; first label-monitor alarm 2005 |
+| Historical loan outcomes are incomplete | `audit.json` E3; decision log D3 | file keeps only loans resolved by 2014 |
 
-## What not to say
-- "Early warning", "predicted the crisis", "prevents losses": none of these is supported.
-- "The alarm beat PSI": PSI and the alarm fired in exactly the same years.
+## What not to say in a live demo
+- "Early warning", "predicted the crisis", "prevents losses": not supported.
+- "The alarm beat PSI": PSI and the alarm fired in the same years.
 - "$5.7B was lost": that figure is gross charged-off principal, before recoveries.
 
 ## Finals (5 minutes + Q&A)
-Same structure, with more time on: the loan-term field (0.96 vs. 0.64 AUC, and why it is only *suspected*
-contamination), the threshold derivation and its uncertainty (Drift section), and the Limitations section. Keep
-`dashboard/index.html` open locally as a backup: the numbers, examples and tables work offline; only charts need internet.
+Same structure, with more time on the loan-term field (suspected contamination, not proven leakage), the threshold
+derivation and its uncertainty, and the Limitations section. Keep `dashboard/index.html` open locally as a backup:
+numbers, examples and tables work offline; only charts need internet.

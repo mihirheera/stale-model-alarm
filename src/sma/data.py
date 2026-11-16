@@ -48,7 +48,7 @@ def _date(s: pd.Series) -> pd.Series:
     """'28-Feb-97' -> Timestamp.
 
     Two-digit years are ambiguous: pandas reads '68' as 2068. The data ends in 2014, so any date
-    after 2015 must really be in the 1900s and is moved back 100 years.
+    after 2015 must be in the 1900s and is moved back 100 years.
     """
     d = pd.to_datetime(s, format="%d-%b-%y", errors="coerce")
     too_late = d.dt.year > 2015

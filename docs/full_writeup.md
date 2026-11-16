@@ -168,9 +168,9 @@ wasn't wrong about one group; it under-rated almost everyone. The dashboard show
 - Libraries: pandas, NumPy, scikit-learn, matplotlib, kagglehub, pytest; Chart.js (dashboard).
 - Methods: adversarial validation / classifier two-sample tests (Lopez-Paz & Oquab, ICLR 2017); Population Stability
   Index (credit-risk industry practice).
-- AI tools: **Claude Code (Anthropic; Claude Opus 5.5, Sonnet 5.5 and Fable 5.2)** helped develop and research the
-  idea, wrote the code, ran the analysis, and drafted the documentation and dashboard, under my direction and review.
-  No pretrained models are used.
+- AI tool: Claude Code (Anthropic), https://claude.com/claude-code. Helped research the idea, write code, run analysis,
+  and draft the documentation and dashboard, under my close direction and review.
+  No pretrained models are used in the project's analysis.
 
 ---
 

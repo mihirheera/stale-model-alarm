@@ -60,7 +60,7 @@ than gradient boosting in FY2009–10.
 For small tables of mixed numbers and categories, gradient-boosted trees are a standard strong choice, train in
 seconds and are easier to inspect. A more complex model would be exposed to the same drift.
 
-**12. How do you know the test years are really unseen?**
+**12. How do you know the test years are unseen?**
 Training uses FY2001–02 only; calibration and the flag cut-off use FY2003 only; FY2004–10 are never touched by either.
 The fiscal year is never a feature. An automated test checks the year sets do not overlap. One caveat: training labels
 are outcomes as known in 2014, which a real bank in 2003 would not yet have had in full. That favours the model, and it
@@ -144,11 +144,11 @@ periods to set and validate a threshold; a measured false-alarm rate; a test on 
 that recalibrating after an alarm actually helps; and the bank's own model-risk governance.
 
 **27. What did you do, and what did Claude Code do?**
-Claude Code (Anthropic) helped develop and research the idea, wrote the code, ran the analysis and drafted the
-documentation and dashboard. I directed the work, made the decisions about what to pursue, repeatedly asked for audits that removed
-claims the evidence did not support (for example "early warning" and "proven leakage"), set up the repository and the
-published dashboard, recorded the demo, and studied the project so that I can explain each part. I did not write the
-modelling code myself.
+Claude Code (Anthropic) helped research the idea, write code, run analysis, and draft the documentation and
+dashboard, under my close direction and review. I did not write the modelling code myself. I directed the work,
+made the decisions about what to pursue, repeatedly asked for audits that removed claims the evidence did not
+support (for example "early warning" and "proven leakage"), set up the repository and the published dashboard,
+recorded the demo video, and studied the project so that I can explain each part.
 
 **28. What would you do with more time?**
 Run the same test on the SBA's newer loan-level data (FY2010 onward, including COVID) to see whether the alarm ever

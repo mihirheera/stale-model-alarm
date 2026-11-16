@@ -101,9 +101,9 @@ Every figure is for years never used in training or calibration.
   https://webharvest.gov/congress115th/20181203195802/https://www.sba.gov/sites/default/files/WDS_Table3_ApprovalCount_Report.pdf
 - Methods: adversarial validation (Lopez-Paz & Oquab, ICLR 2017); PSI (credit-risk practice).
 - Libraries: pandas, NumPy, scikit-learn, matplotlib, kagglehub, pytest, Chart.js.
-- AI tools: **Claude Code (Anthropic; Claude Opus 5.5, Sonnet 5.5 and Fable 5.2)** helped develop and research the
-  idea, wrote the code, ran the analysis, and drafted the documentation and dashboard, under my close direction and review.
-  No pretrained models are used.
+- AI tool: Claude Code (Anthropic), https://claude.com/claude-code. Helped research the idea, write code, run analysis,
+  and draft the documentation and dashboard, under my close direction and review.
+  No pretrained models are used in the project's analysis.
 
 ---
 

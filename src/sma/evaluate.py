@@ -4,12 +4,12 @@ Plain-English meaning of each metric (see docs/technical_guide.md for more):
   auc            : if you pick one defaulted and one repaid loan at random, how often does the model give
                    the defaulted one the higher risk? 0.5 = coin flip, 1.0 = perfect ranking.
   pr_auc         : like AUC but focused on finding defaults; compare to the default rate (its chance level).
-  precision      : of the loans the model flagged, the share that really defaulted.
-  recall         : of the loans that really defaulted, the share the model flagged.
+  precision      : of the loans the model flagged, the share that defaulted.
+  recall         : of the loans that defaulted, the share the model flagged.
   f1             : one number balancing precision and recall.
   brier          : average squared gap between predicted probability and what happened (lower = better).
   predicted_rate : the average predicted default probability = how many defaults the model expects.
-  actual_rate    : the share that really defaulted.
+  actual_rate    : the share that defaulted.
   calib_ratio    : actual_rate / predicted_rate. 1.0 = the model expected the right number of defaults.
                    2.0 = twice as many loans defaulted as the model expected.
 """

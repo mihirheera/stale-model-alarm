@@ -8,9 +8,9 @@ A self-assessment against the Round 1 rubric. Score ranges are realistic estimat
 | **Originality (20)** | A monitoring question rather than a prediction one; a second classifier auditing the first; tested against both prediction and monitoring baselines; a suspicious field found and excluded | README "What I added"; `docs/decision_log.md` D1; Drift section of the dashboard | Drift monitoring and adversarial validation are known techniques; the novelty is the application and the test design. | None | 13–16 |
 | **Impact and track fit (20)** | A named user (community-bank credit-risk analyst); a concrete review decision; scale shown with model-implied vs. recorded gross charge-offs; never decides a loan | README "The problem", dashboard overview and Actions section | Helps the lender, not the borrower directly; no earlier warning than a simple default count was shown; benefit of acting on an alarm not measured; gross charge-offs are not net losses | None; do not overstate in the video | 11–14 |
 | **Testing and honesty (15)** | Baselines reported side by side; unseen test years; precision, recall, PR-AUC, Brier, calibration; robustness checks; an explicit failure example chosen by rule; limitations stated: no lead time, preliminary threshold, FY2004 close call, incomplete outcomes, FY2010 decay, suspected (not proven) contamination | README "Where it fails"; dashboard Limitations; `docs/full_writeup.md`; `docs/judge_qa.md` | One dataset and one downturn; false-alarm rate cannot be estimated | None | 12–14 |
-| **Communication (15)** | README in the official template with one main takeaway; dashboard organised around the analyst's workflow; timed 2-minute script with storyboard and fact check; 28-question Q&A | README, dashboard, `docs/demo_script.md` | README is longer than one page; dashboard is dense; **video not yet recorded** | Record and upload the video | 10–13 (9–11 without a video) |
+| **Communication (15)** | README in the official template with one main takeaway; dashboard organised around the analyst's workflow; 1:59 demo video (https://youtu.be/Q_YpQ6imcLw) with captioned intro, synced dashboard walkthrough and fact-checked narration; 28-question Q&A | README, dashboard, `docs/demo_script.md` | Dashboard is dense; voice-over speaks quickly (sped up 8% to fit 2:00) | None | 11–13 |
 
-Overall: roughly 67–82 of 100, depending mostly on how judges weigh the modest model and the absence of a demonstrated
+Overall: roughly 68–82 of 100, depending mostly on how judges weigh the modest model and the absence of a demonstrated
 lead-time advantage against the testing and honesty.
 
 ## Official requirement checklist
@@ -25,4 +25,4 @@ lead-time advantage against the testing and honesty.
 | "This project is a prototype and is not financial advice." | Yes | README line 6; dashboard footer |
 | Cites datasets, tools and AI tools | Yes | README "Sources" |
 | Code viewable by anyone | Yes | https://github.com/mihirheera/stale-model-alarm |
-| Demo video, up to 2 minutes (optional, recommended) | **To do** | `docs/demo_script.md` |
+| Demo video, up to 2 minutes (optional, recommended) | Yes | https://youtu.be/Q_YpQ6imcLw; `docs/demo_script.md` |
