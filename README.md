@@ -114,4 +114,4 @@ cd src && python -m sma.audit && python -m sma.pipeline && python -m sma.figures
 cd .. && python dashboard/build_dashboard.py && pytest -q    # 13 tests
 ```
 Code: `src/sma/` · results: `results/` · dashboard: `dashboard/` · docs: [full write-up](docs/full_writeup.md),
-[feature audit](docs/feature_audit.md), [decision log](docs/decision_log.md), [technical guide](docs/technical_guide.md).
+[feature audit](docs/feature_audit.md), [decision log](docs/decision_log.md), [judge Q&A](docs/judge_qa.md).

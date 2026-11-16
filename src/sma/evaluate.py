@@ -1,6 +1,6 @@
 """Measure how well a model did on one group of loans, with bootstrap confidence intervals.
 
-Plain-English meaning of each metric (see docs/technical_guide.md for more):
+Plain-English meaning of each metric:
   auc            : if you pick one defaulted and one repaid loan at random, how often does the model give
                    the defaulted one the higher risk? 0.5 = coin flip, 1.0 = perfect ranking.
   pr_auc         : like AUC but focused on finding defaults; compare to the default rate (its chance level).
