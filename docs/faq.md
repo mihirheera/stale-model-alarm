@@ -34,6 +34,12 @@ It does not by itself mean borrowers are riskier.
 No. An alarm means the model is being used on applicants unlike the ones it learned from, so it should be reviewed.
 In this data the drift score kept rising in FY2009 and FY2010 while recorded default rates fell.
 
+**What is AUC?**
+A score for how well a model ranks risk. Pick one loan that defaulted and one that was repaid at random: AUC is how
+often the model gave the defaulted loan the higher risk score. 0.5 means no better than a coin flip and 1.0 means
+perfect. AUC only measures ranking, not whether the predicted percentages are right, so a model can have a decent
+AUC and still underestimate how many loans will default. That is what happened here.
+
 **How well does it work?**
 On years it never saw (FY2004 to FY2007), Model 1 ranked loans better than two simple rules: AUC 0.62 to 0.66, against
 about 0.53 to 0.54 for an industry lookup table and 0.5 for the average rate. But it badly underestimated how many loans
@@ -58,11 +64,6 @@ That cannot be tested here. The data has no demographic information, and none is
 **Could a real bank use it today?**
 No. It is a retrospective study of one dataset. A bank would need to test it on its own data, over more time periods,
 before relying on it.
-
-**Who built it, and was AI used?**
-Mihir Heera, for the Veritas AI International High School Hackathon 2026 (Finance track). Claude Code (Anthropic) helped
-research the idea, write code, run analysis, and draft the documentation and dashboard, under my close direction and
-review.
 
 **How can I run it myself?**
 Follow the "Reproduce" steps at the bottom of the README. It takes about three minutes and gives identical results.
