@@ -154,6 +154,7 @@ footer{margin:26px 0 40px;padding-top:10px;border-top:1px solid var(--line2);fon
 </div></header>
 
 <main class="wrap">
+  <p class="small" style="margin:14px 0 -8px"><b style="color:var(--navy)">For a community-bank credit-risk analyst reviewing a loan model.</b> Model 1 predicts each loan's default risk. Model 2 checks, from application forms alone, whether this year's applicants still resemble the ones Model 1 was built from. This is a retrospective replay of historical SBA loans, not a deployed system.</p>
   <section id="overview">
     <div class="sh"><h2>Model health overview</h2><span id="ovSub"></span></div>
     <div class="ov">
@@ -277,7 +278,7 @@ function buildStatic(){
   $("find").innerHTML = [
     [`${pct(last.predicted_rate)} → ${pct(last.actual_rate)}`, `FY${last.fy}: predicted vs. observed default rate${last.actual_rate_lower_bound?` (observed at least ${pct(last.actual_rate_lower_bound)})`:""}`],
     [`${hit.length} of ${bad.length}`, `judged years with deteriorated performance in which the drift alert was on. ${s.first_label_monitor_alarm===s.first_drift_alarm?"A simple default-count check fired in the same first year: no lead time shown.":""}`],
-    [`${money(T.implied_loss)} vs. ${money(T.actual_loss)}`, `model-implied vs. actual charge-offs, ${span(mature.map(r=>r.fy))}, on ${money(T.lent)} lent`]]
+    [`${money(T.implied_loss)} vs. ${money(T.actual_loss)}`, `model-implied vs. recorded gross charge-offs, ${span(mature.map(r=>r.fy))}, on ${money(T.lent)} approved. Gross principal, before recoveries; not final losses.`]]
     .map(([b,t])=>`<div><b>${b}</b><span class="small">${t}</span></div>`).join("");
 
   const cols = [["FY","fy",v=>"FY"+v],["Outcomes","outcome_mature",v=>v?"mature":"incomplete"],["Loans","n",v=>v.toLocaleString()],["Predicted","predicted_rate",pct],
@@ -293,7 +294,7 @@ function buildStatic(){
   const box = (b,sp,cls="") => `<div class="box ${cls}"><b>${b}</b><span>${sp}</span></div>`, conn = `<div class="conn"></div>`;
   $("dia").innerHTML =
     `<div><h3>Stream 1: credit-risk model</h3>${box("Historical SBA loan data", `${cfg.n_train.toLocaleString()} loans approved ${span(cfg.train_years)}, outcomes known`)}${conn}
-      ${box("Data cleaning and feature preparation", `${cfg.features.length} approval-day details; leaking fields removed`)}${conn}
+      ${box("Data cleaning and feature preparation", `${cfg.features.length} approval-day details; outcome fields and the suspect loan-term field excluded`)}${conn}
       ${box("Historical credit-risk model", `gradient boosting, calibrated on FY${cfg.validation_year}`)}${conn}${box("Predicted default risk", "one probability per loan", "out")}</div>
      <div><h3>Stream 2: population monitor</h3>${box("Historical applicant population", `applications from ${span(refYears)} (reference)`)}${conn}
       ${box("Compare against newer applicants", "application details only; no repayment outcomes")}${conn}
@@ -320,14 +321,14 @@ function buildStatic(){
   const firstInc = D.table.find(r=>!r.outcome_mature);
   $("limList").innerHTML = [
     `<b>The risk model is modest.</b> Its AUC was ${f2(Math.min(...ma))}–${f2(Math.max(...ma))} in the judged years (industry-rule baseline ${f2(Math.min(...mi))}–${f2(Math.max(...mi))}). It is a monitoring test case, not a model fit for lending decisions.`,
-    `<b>No earlier warning has been shown.</b> The drift alert first fired for FY${s.first_drift_alarm}; a simple default-count check first fired for FY${s.first_label_monitor_alarm}, and the standard PSI check for FY${s.first_psi_alarm}. The drift alert's advantages are that it needs no outcome data and shows what changed.`,
-    `<b>False alarms happen.</b> Scoring each reference year against the others gave ${s.reference_false_alarms} false alarm in ${ny.length}: FY${top[0]} (${f3(top[1].adv_auc)}), which is also the year that sets the alert threshold.`,
-    close.length ? `<b>A mild problem was not flagged.</b> ${close.map(r=>`FY${r.fy} had ${f2(r.calib_ratio)}× the predicted defaults with a drift score of ${f3(r.adv_auc)}, just under the ${f3(THR)} threshold`).join("; ")}. Under this project's rule (more than ${cfg.ratio_cutoff}×) that is not a failure; under a stricter rule it would be a miss.` : "",
+    `<b>No earlier warning has been shown.</b> The drift alert first fired for FY${s.first_drift_alarm}; a simple default-count check (two-year lag) first fired for FY${s.first_label_monitor_alarm}${D.label_first_lag3?`, or FY${D.label_first_lag3} with a three-year lag`:""}, and the standard PSI check for FY${s.first_psi_alarm}. The drift alert's advantages are that it needs no outcome data and shows what changed.`,
+    `<b>The alert threshold is preliminary.</b> It rests on ${ny.length} reference years, too few to estimate a false-alarm rate. FY${top[0]} was the most unusual (${f3(top[1].adv_auc)}) and sets the line; had it been left out, it would itself have been flagged. With a "largest value" rule, that leave-one-out check always flags one year, so it is not a measured rate.`,
+    close.length ? `<b>A mild problem was not flagged.</b> ${close.map(r=>`FY${r.fy} had ${f2(r.calib_ratio)}× the predicted defaults with a drift score of ${f3(r.adv_auc)}, just under the ${f3(THR)} threshold${D.seed_spread[r.fy]?` (${f3(D.seed_spread[r.fy].min)}–${f3(D.seed_spread[r.fy].max)} under three other random seeds)`:""}`).join("; ")}. Under this project's rule (more than ${cfg.ratio_cutoff}×) that is not a failure; under a stricter rule it would be a miss.` : "",
     `<b>The model degraded badly by FY${lastY.fy}.</b> Its AUC was ${f3(A[lastY.fy])} against ${f3(IR[lastY.fy])} for the industry rule (outcome-incomplete year).`,
     `<b>Outcomes are incomplete (right-censoring).</b> The file only contains loans whose outcome was known by 2014, so later cohorts over-state default rates. FY${firstInc.fy} onward are not judged; lower bounds use official SBA approval counts.`,
     `<b>Drift does not prove higher default risk.</b> Drift scores keep rising in the outcome-incomplete years while recorded default rates fall. Part of the measured drift reflects SBA program and data-coding changes.`,
-    `<b>A leaking field was removed.</b> With the loan-term column the AUC is about ${f2(wT)}, against ${f2(woT)} without it. It behaves as if edited after loans went bad, so it is excluded.`,
-    `<b>One dataset, one downturn.</b> US SBA loans around a single crisis, with no credit scores, financial statements or demographic fields. No protected-group fairness audit is possible, and results may not carry over to other lenders or periods.`,
+    `<b>A suspect field was excluded.</b> With the loan-term column the AUC is about ${f2(wT)}, against ${f2(woT)} without it. Odd-length terms default far more often than round ones, which suggests the field may carry outcome information. The mechanism is not established, so this is suspected contamination, not proven leakage.`,
+    `<b>One dataset, in hindsight.</b> US SBA loans; the judged years (${span(mature.map(r=>r.fy))}) are the run-up to the 2008 financial crisis, and loans approved during it cannot yet be judged. There are no credit scores, financial statements or demographic fields. No protected-group fairness audit is possible, and this is not evidence of how the method would perform at a real bank.`,
     `<b>What it is not.</b> It does not predict economic crises, prevent defaults or make lending decisions. It helps an analyst recognise when an existing model may need review.`]
     .filter(Boolean).map(x=>`<li>${x}</li>`).join("");
 }
@@ -353,7 +354,7 @@ function render(){
   $("cells").innerHTML = [
     cell("Loans analyzed","Number of loans approved in the selected fiscal year with a recorded outcome.", r.n.toLocaleString(), `approved Oct ${sel-1} – Sep ${sel}`),
     cell("Predicted default rate","Average default probability the risk model assigned to this year's loans. A model estimate.", pct(r.predicted_rate), `<span class="tag model">model</span> mean predicted probability`),
-    cell("Observed default rate","Share of this year's loans recorded as charged off. Historical outcome; unreliable when outcomes are incomplete.", pct(r.actual_rate),
+    cell("Observed default rate","Share of this year's loans in the data file recorded as charged off. The file omits loans still running in 2014, so later years are over-stated. The lower bound assumes every loan missing from the file (per official SBA approval counts) was repaid.", pct(r.actual_rate),
       (inc?`<span class="tag">incomplete</span> not reliable`:`<span class="tag obs">observed</span> historical outcome`) + (lb?`; lower bound ${pct(lb)}`:""), inc),
     cell("Observed ÷ predicted","Observed default rate divided by predicted. 1.00× means the model expected the right number of defaults.", inc?"n/a":f2(r.calib_ratio)+"×",
       inc?"not assessable: outcomes incomplete":`1.00× = estimate correct${ci.calib_ratio?`; 95% CI ${f2(ci.calib_ratio[0])}–${f2(ci.calib_ratio[1])}`:""}`, inc),
@@ -363,13 +364,13 @@ function render(){
       `threshold ${f3(THR)}; ${margin>=0?"above":"below"} by ${Math.abs(margin).toFixed(3)}`),
     cell("Largest PSI","Population Stability Index for the application detail that shifted most. Above 0.25 is conventionally a large shift.", f2(r.max_psi),
       `${LABEL[r.max_psi_feature]}; ${psiN} of ${nF} details above ${PSI_T}`),
-    cell("Charge-offs: actual vs. implied","Dollars actually charged off on this year's loans, against what the model's probabilities implied.", money(im.actual_loss),
-      `model-implied ${money(im.implied_loss)} on ${money(im.lent)} lent${inc?"; incomplete":""}`, inc)].join("");
+    cell("Gross charge-offs","Principal recorded as charged off on this year's loans, against what the model's probabilities implied. Gross figures: before any recoveries, and shared between the lender and the SBA guarantee. Not final losses.", money(im.actual_loss),
+      `recorded; model-implied ${money(im.implied_loss)} on ${money(im.lent)} approved${inc?"; incomplete":""}`, inc)].join("");
 
   /* C: drift */
   const pos = v => Math.max(0, Math.min(100, (v-0.5)/0.5*100));
   $("advBox").innerHTML = `<h3>Method 2: adversarial validation <span class="tag">machine learning</span></h3>
-    <p class="small">A second classifier is shown applications from the reference years (${span(refYears)}) mixed with FY${sel} applications and must tell them apart, using application details only. Its score on held-out applications is the drift score.</p>
+    <p class="small">A second classifier is shown applications from the reference years (${span(refYears)}) mixed with FY${sel} applications and must tell them apart, using application details only. Its score on held-out applications is the drift score. The reference is ${span(refYears)} rather than only the ${span(cfg.train_years)} training years because Model 1 was also calibrated on FY${cfg.validation_year}.</p>
     <div><span class="bigv">${f3(r.adv_auc)}</span> <span class="${r.drift_alarm?"res-y":"res-n"}">${r.drift_alarm?"ALERT":"no alert"}</span> <span class="small">${sgn(margin)} relative to threshold ${f3(THR)}</span></div>
     <div class="gauge"><div class="g-fill" style="width:${pos(r.adv_auc)}%"></div><div class="g-thr" style="left:${pos(THR)}%"><span>threshold</span></div></div>
     <div class="gscale"><span>0.5 indistinguishable</span><span>1.0 completely different</span></div>

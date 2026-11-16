@@ -1,28 +1,28 @@
-# Rubric mapping
+# Rubric matrix
 
-How the submission shows each judging criterion. The official Briefs list four unweighted criteria (technical quality,
-impact, creativity, clarity) plus "What every project should show" and the Finance-track requirements. The weights
-below are the ones we were told judges will use.
+A self-assessment against the Round 1 rubric. Score ranges are realistic estimates, not guarantees.
 
-| Criterion | What judges look for | Where we show it | Remaining weakness |
-|---|---|---|---|
-| **Technical execution (30)** | It works and is well built | One command reruns everything from public data (`python -m sma.pipeline`). 13 automated tests, including leakage guards. Time-based split: train FY01–02, calibrate FY03, test FY04–10. Calibrated probabilities. Bootstrap intervals. The dashboard is generated from `results.json` (no hand-typed numbers) and works offline. "A real input producing a result": dashboard **Real examples** card. Build diagram: README appendix. | Model 1's AUC is modest (0.62–0.66) because the data has no credit scores or financials |
-| **Originality (20)** | Fresh take, not a tutorial | Own question (can a model tell it's gone stale?), own data (899k SBA loans across the 2008 crisis), own user (bank model-risk analyst). A second AI audits the first. Alarm threshold set only from normal years. A leak (loan term) found and removed. README "What we added" | Drift detection is a known ML area; the novelty is the application and the honest test against a real crisis |
-| **Impact & track fit (20)** | Real problem; safer money decision; beats a simple rule | Dollars: $2.76B expected vs. $5.66B charged off FY2004–07; lenders' own share $0.91B vs. $1.97B (README "The problem", full write-up E9, dashboard tile). Beats the average-rate and industry-rule baselines on AUC, PR-AUC and Brier. Human-in-the-loop: it never decides a loan | Who benefits most is the lender and the SBA (taxpayers); the benefit to borrowers is argued, not measured |
-| **Testing & honesty (15)** | Measured it; knows where it fails | Precision and recall for the model and baselines; calibration; a label-monitor comparison; robustness checks (windows, features, thresholds, seeds). Failures stated up front: no lead time, 1/3 false alarms, FY2004 miss, ~40% of defaults missed, FY2010 worse than the rule, group gaps. One wrong example chosen by a fixed rule, with why | One crisis (n = 1); no protected-attribute data |
-| **Communication (15)** | Clear write-up and video | README follows the official template, with one bold takeaway and a single results table; details are in `docs/full_writeup.md`. Dashboard with plain-language statuses. 2-minute script in the official 15/60/30/15 structure. Technical guide and 22-question Q&A for finals | The video isn't recorded yet; the README is a bit over one page |
+| Category | What the project demonstrates | Evidence a judge can inspect | Remaining weaknesses | Final action | Estimated range |
+|---|---|---|---|---|---|
+| **Technical execution (30)** | Two working ML models; chronological split (train FY2001–02, calibrate FY2003, test FY2004–10); calibrated probabilities; fair baselines fitted on training years; bootstrap intervals; 13 automated tests; deterministic pipeline that a clean clone reproduces exactly; dashboard generated from results files | `src/sma/`, `tests/test_core.py`, `results/results.json`, README appendix, live dashboard | Model 1 is modest (AUC 0.62–0.66) and decays; alarm threshold from three reference years; no deployment-style validation | None required | 21–25 |
+| **Originality (20)** | A monitoring question rather than a prediction one; a second classifier auditing the first; tested against both prediction and monitoring baselines; a suspicious field found and excluded | README "What we added"; `docs/decision_log.md` D1; Drift section of the dashboard | Drift monitoring and adversarial validation are known techniques; the novelty is the application and the test design. | None | 13–16 |
+| **Impact and track fit (20)** | A named user (community-bank credit-risk analyst); a concrete review decision; scale shown with model-implied vs. recorded gross charge-offs; never decides a loan | README "The problem", dashboard overview and Actions section | Helps the lender, not the borrower directly; no earlier warning than a simple default count was shown; benefit of acting on an alarm not measured; gross charge-offs are not net losses | None; do not overstate in the video | 11–14 |
+| **Testing and honesty (15)** | Baselines reported side by side; unseen test years; precision, recall, PR-AUC, Brier, calibration; robustness checks; an explicit failure example chosen by rule; limitations stated: no lead time, preliminary threshold, FY2004 close call, incomplete outcomes, FY2010 decay, suspected (not proven) contamination | README "Where it fails"; dashboard Limitations; `docs/full_writeup.md`; `docs/judge_qa.md` | One dataset and one downturn; false-alarm rate cannot be estimated | None | 12–14 |
+| **Communication (15)** | README in the official template with one main takeaway; dashboard organised around the analyst's workflow; timed 2-minute script with storyboard and fact check; 28-question Q&A | README, dashboard, `docs/demo_script.md` | README is longer than one page; dashboard is dense; **video not yet recorded** | Record and upload the video | 10–13 (9–11 without a video) |
 
-## Official checklist
-| Requirement (source) | Met? | Where |
+Overall: roughly 67–82 of 100, depending mostly on how judges weigh the modest model and the absence of a demonstrated
+lead-time advantage against the testing and honesty.
+
+## Official requirement checklist
+| Requirement | Met? | Where |
 |---|---|---|
-| Who is it for? (Briefs §3) | Yes | README "What we built": community-bank credit-risk analyst |
-| A real input producing a result (§3) | Yes | Dashboard "Real examples"; README "One loan it got wrong" |
-| Beats a simple baseline, both reported (§3, Finance) | Yes | README results table |
-| At least one example it gets wrong, and why (§3) | Yes | README "Where it fails"; `results.json` E10 |
-| A measure that fits; precision/recall (Finance) | Yes | README table: AUC, precision/recall; full write-up: PR-AUC, Brier |
-| Dated data → train earlier, test later (Finance) | Yes | `config.py`, tests |
-| "This project is a prototype and is not financial advice." | Yes | README top, dashboard |
-| Cite every dataset, tool, AI tool | Yes | README "Sources" (Claude Code included) |
-| Write-up of about one page, in the template | Yes, slightly long | README |
-| Video ≤ 2 min (optional, recommended) | **To do** | `docs/demo_script.md` |
-| Code link viewable by anyone | **To do** | Push to a public GitHub repo |
+| Names a specific user | Yes | README "What we built"; dashboard intro line |
+| Real input producing a result | Yes | Dashboard "Loans" section; README "One loan it got wrong" |
+| Compares with at least one simple baseline, both reported | Yes | README results table (model / industry rule / average) |
+| Shows where it fails | Yes | README "Where it fails"; dashboard Limitations |
+| Fitting measure; precision and recall | Yes | README table; `docs/full_writeup.md` has baseline precision/recall |
+| Train on earlier data, test on later | Yes | `src/sma/config.py`; `tests/test_core.py` |
+| "This project is a prototype and is not financial advice." | Yes | README line 6; dashboard footer |
+| Cites datasets, tools and AI tools | Yes | README "Sources" |
+| Code viewable by anyone | Yes | https://github.com/mihirheera/stale-model-alarm |
+| Demo video, up to 2 minutes (optional, recommended) | **To do** | `docs/demo_script.md` |

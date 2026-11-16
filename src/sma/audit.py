@@ -60,7 +60,8 @@ def cohort_table(df: pd.DataFrame) -> pd.DataFrame:
 def e2_term_audit(df: pd.DataFrame) -> dict:
     """If Term is a contract fact set at approval, two loans with terms of 83 and 84 months should have
     similar default rates. If odd terms default far more often than round ones *within the same range*,
-    Term was probably rewritten after the loan got into trouble (e.g. on restructuring or charge-off)."""
+    Term may carry outcome information (for example if it was altered when a loan got into trouble).
+    The check below shows the mechanism is NOT simply 'term = time to charge-off', so this stays a suspicion."""
     # Use only old, fully mature cohorts so missing (unresolved) loans cannot explain the pattern.
     m = df[df["fy"].between(1990, 2000) & df["y"].notna() & df["term"].between(1, 239)].copy()
     m["round_term"] = (m["term"] % 12 == 0)

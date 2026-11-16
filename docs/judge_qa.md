@@ -1,120 +1,156 @@
-# Judge Q&A: hard questions, honest answers
+# Judge Q&A: hard questions, candid answers
 
-All numbers come from `results/results.json`. If you don't know something, say "I don't know; here's how I'd find out."
+All numbers come from `results/results.json` and `results/audit.json`. If you don't know something, say "I don't know;
+here is how I would find out."
 
-**1. How do you know there's no data leakage?**
-We listed every column and asked whether a bank knows it on approval day ([feature audit](feature_audit.md)). We
-removed the charge-off date, charge-off amount and current balance, which only exist after the outcome. We also
-checked for a hidden leak: loan term. In fully matured loans, round terms defaulted 0.8% and odd terms 29.6%, which is
-impossible for a contract set on day one, so we removed it. With it, AUC was ~0.96; without it, ~0.64. Our test suite
-checks that none of these columns is a feature. The model never sees the year, and test years are never used in
-training or calibration.
+## The idea
 
-**2. Why this dataset?**
-It is large (899,164 real loans), public (CC BY 4.0, published in a statistics journal), about small businesses (the
-track's own words), and it spans a real, dated crisis. That lets us test a monitoring idea against what actually
-happened.
+**1. What is this, in one sentence?**
+A retrospective test of whether a bank's credit-risk analyst could tell that a loan model was going out of date using
+only application forms, without waiting years for loans to default.
 
-**3. Why not a neural network?**
-For tables of mixed numbers and categories, gradient-boosted trees are usually as good or better, train in seconds on
-a laptop, and are easier to inspect. Our question is about *monitoring*, not squeezing out accuracy. A fancier model
-would be just as exposed to a changing world.
+**2. How is this different from a normal default-prediction project?**
+The default model is not the product; it is the thing being monitored. The contribution is the second model and the
+test design: does a drift signal built without outcomes line up with later, measured model failure, and how does it
+compare with simpler monitors?
 
-**4. Why is PSI useful if you built something better?**
-PSI is what banks already use, so it is the fair baseline. It is simple and explainable per feature. Its weakness: it
-looks at one feature at a time and its thresholds are rules of thumb. Here PSI and our detector flagged the same
-years, so we don't claim ours beats PSI at *detection*. Ours adds a single all-feature score and shows which features
-matter together.
+**3. What is actually AI here, rather than ordinary statistics?**
+Two machine-learning classifiers. Model 1 (gradient boosting) learns from 81,624 labelled loans to predict default.
+Model 2 (also gradient boosting) learns to tell one year's applications from the reference years; its accuracy is the
+drift score. PSI, by contrast, is ordinary statistics, and I use it as the baseline.
 
-**5. Data drift vs. concept drift?**
-Data drift = the inputs change (more SBA Express loans, smaller guarantees). Concept drift = the link between inputs
-and default changes (the same kind of business becomes riskier because the economy turned). Our detector only sees
-data drift. In 2005–07 both seem to have happened; we can't fully separate them.
+**4. Why are two models needed?**
+They answer different questions. Model 1: "will this loan default?", which needs outcomes. Model 2: "do this year's
+applicants still look like the ones Model 1 was built from?", which needs no outcomes and so is available immediately.
 
-**6. Can a model drift without losing accuracy?**
-Yes. That's why our alarm says "review", not "broken". FY2009–10 show rising drift while the (incomplete) default rate
-falls. Part of the drift is also program or coding changes (LowDoc ended, credit-line codes changed), which need not
-change risk.
+**5. Why adversarial validation and not just PSI?**
+PSI looks at one application detail at a time with rule-of-thumb cut-offs. Adversarial validation combines all 13
+details into one score and can pick up shifts in combinations. Candidly: in this data both flagged exactly the same
+years (FY2005–10), so I cannot claim it detects more than PSI. It gave one combined score and a ranking of which
+details mattered.
 
-**7. Can performance get worse without obvious drift?**
-Yes. FY2004 had 21% more defaults than expected while the drift score (0.677) stayed under the threshold (0.695).
-Under a stricter definition of "deteriorated" that is a miss. If the economy changes but applicants look the same, an
-input-drift alarm can't see it. That's why it should sit next to outcome monitoring, not replace it.
+## The models and metrics
 
-**8. How do you know the alert is genuinely early?**
-We don't claim it is. A simple monitor counting early defaults among loans from two years before *also* first fired in
-FY2005. What we can say: our alarm needs no outcome data at all, it is available on approval day, and it explains what
-changed. Proving lead time needs more downturns, e.g. the COVID era in newer SBA data.
+**6. What does AUC mean?**
+Pick one loan that defaulted and one that was repaid. AUC is how often the model gave the defaulted one the higher
+risk. 0.5 is chance, 1.0 is perfect. It measures ranking only.
 
-**9. What if the detector raises a false alarm?**
-A person reviews the model, which costs some analyst time and no loans are blocked. Among the normal years, a
-leave-one-year-out check gave 1 false alarm in 3, so false alarms are realistic. That's acceptable for a "please
-check" signal, not for an automatic action.
+**7. How can the model rank borrowers reasonably and still under-estimate defaults?**
+Ranking (discrimination) and percentages (calibration) are different things. If every borrower's true risk doubles,
+the order stays the same, so AUC barely moves, but every predicted percentage is now too low. That is what happened:
+AUC went from 0.68 to 0.62, while observed defaults reached 2.4× the predicted rate by FY2007.
 
-**10. How would a real bank use it?**
-Every quarter or year, run the detector on new applications against the model's training data. If the alarm is on,
-the model-risk team reviews it: recalibrate, retrain, or add a human check for the shifted segment (the detector says
-which features moved). It never touches individual loan decisions.
+**8. An AUC of 0.62–0.66 is weak. Why should anyone care?**
+It is modest, and the write-up says so. The data has no credit scores or financial statements, only 13 application
+details. The model is a realistic test subject for monitoring, not something to lend with. A version including the
+suspect loan-term field scored 0.96, which is the "too good to be true" pattern.
 
-**11. How did you set the threshold, and could you have tuned it to look good?**
-It is the largest drift seen *between the normal years themselves* (FY2001–03), computed before looking at 2004+. We
-also tried margins of +0.02, +0.05 and +0.10 above it: the same years alarm in every case.
+**9. Is the baseline fair?**
+Yes. Both baselines are fitted on the same FY2001–02 training loans and evaluated on the same later years. The
+average-rate baseline predicts 11.8% for everyone; the industry rule looks up each 2-digit industry's training default
+rate. Neither uses future information.
 
-**12. Your model's AUC is only ~0.64. Isn't that weak?**
-It's modest, and honest. Small-business default is hard to predict from a few application fields, with no credit
-scores or financial statements. It still clearly beats the baselines in FY2004–07 (0.53–0.54 industry rule, 0.50 average rate),
-and its Brier score is lower than both in those years. By FY2010 it no longer beats the industry rule (AUC 0.50 vs.
-0.55), which is another sign it had gone stale. The leaky version scored 0.96, which is exactly the "too good to be
-true" warning the judges mention.
+**10. Does Model 1 beat the baselines on everything?**
+No. In FY2004–07 it beats both on AUC, PR-AUC and Brier score, and has higher precision than the industry rule. Its
+recall is slightly lower than the industry rule's in FY2004–06 (0.58–0.60 vs. 0.62–0.63) because it flags fewer loans.
+In FY2010 (outcome-incomplete) its AUC is 0.50 against 0.55 for the industry rule, and logistic regression does better
+than gradient boosting in FY2009–10.
 
-**13. Is the jump in defaults real or an artefact?**
-Partly an artefact. The file only contains loans whose outcome was known by 2014, so late cohorts look worse. We
-checked against official SBA counts: even if every missing FY2007 loan was repaid, at least 30.8% defaulted, vs.
-11.8% in training. The jump is real; its exact size isn't certain. FY2008–10 are labelled "outcome-incomplete" and not
-judged.
+**11. Why not a neural network?**
+For small tables of mixed numbers and categories, gradient-boosted trees are a standard strong choice, train in
+seconds and are easier to inspect. A more complex model would be exposed to the same drift.
 
-**14. Are the year-to-year differences statistically meaningful?**
-Each year has 17,000–77,000 loans. 95% bootstrap intervals are narrow (AUC about ±0.005; calibration ratio about
-±0.02), so the trends aren't sampling noise. We avoided piles of p-values. The big uncertainty isn't sample size;
-it's that we have one crisis (n = 1).
+**12. How do you know the test years are really unseen?**
+Training uses FY2001–02 only; calibration and the flag cut-off use FY2003 only; FY2004–10 are never touched by either.
+The fiscal year is never a feature. An automated test checks the year sets do not overlap. One caveat: training labels
+are outcomes as known in 2014, which a real bank in 2003 would not yet have had in full. That favours the model, and it
+still mis-estimated badly.
 
-**15. Does drift *cause* defaults?**
-We don't claim that. Drift tells you the model is being used on unfamiliar borrowers. One plausible story: more
-SBA Express-style loans (smaller guarantees, lighter paperwork) were made just before the recession. That is a
-hypothesis we haven't tested.
+## Data problems
 
-**16. Is it fair? Does it hurt some groups more?**
-The data has no race, gender or age fields, so a protected-group audit isn't possible, and we don't guess them from
-names or places. Across the groups we *can* check, under-prediction hit everyone, but unevenly: Florida 2.69×
-expected defaults, Ohio 1.36×. In professional services and health care, the model caught only 26% and 15% of
-defaults. A bank should check segments like these when the alarm fires.
+**13. Tell us about the loan-term field. Is it leakage?**
+I cannot prove it is. In mature cohorts, loans with round terms defaulted 0.8% and odd terms 29.6%; 84 months 0.3%,
+83 months 10.3%. That is hard to explain for a contract length fixed at approval. But the recorded term matches the
+time to charge-off for only 4% of charged-off loans, so the simple "it was overwritten with time-to-default"
+explanation is not supported. My hypothesis is that it was altered for some troubled loans. I treat it as suspected
+contamination and exclude it. Including it would raise AUC to about 0.96, and I do not report that as a result.
 
-**17. What's the difference between your two AI models?**
-Model 1 answers "will *this loan* default?" and learns from outcomes. Model 2 answers "do *this year's borrowers* look
-like the ones model 1 learned from?" and never sees outcomes.
+**14. Are any other features unavailable at approval?**
+The charge-off date, charge-off amount and outstanding balance exist only after the outcome and are excluded. The
+disbursed amount comes slightly after approval, so I use the approved amount instead. The full list is in
+`docs/feature_audit.md`.
 
-**18. Your training labels come from outcomes up to 2014. Isn't that cheating?**
-It's generous *to the model*. A real bank in 2004 couldn't know how 2001–03 loans would end. So our model had an
-advantage a real one wouldn't, and it still went badly wrong. That makes the finding stronger, not weaker.
+**15. What about missing outcomes (right-censoring)?**
+The file only contains loans resolved by 2014. Loans still running, mostly ones being repaid, are missing, so later
+cohorts over-state default rates. That is why only FY2004–07 are judged, and FY2008–10 are shown as
+outcome-incomplete.
 
-**19. What did you do vs. what did the AI tool do?**
-[Answer honestly in your own words.] Claude Code wrote most of the code and ran the analysis; we chose the question
-and the user, reviewed every decision in the decision log, and checked the results make sense. Be ready to explain
-any file in the technical guide's code table.
+**16. Why is FY2007's figure uncertain?**
+42.8% is the default rate among the 71,649 FY2007 loans in the file. Official SBA counts show 99,603 approvals that
+year. If every missing loan was repaid, the rate would be 30.8%. The truth lies between. Even the lower bound is well
+above the 17.5% predicted.
 
-**20. What would you do with more time or data?**
-Run the same test on the SBA's newer data (2010–present, including COVID) to see if the alarm ever gives real lead
-time. Then test whether recalibrating when the alarm fires actually closes the gap between expected and actual defaults.
+## The alarm
 
-**21. Where does the "$2.8B expected vs. $5.7B actual" come from?**
-For each FY2004–07 loan we multiplied the model's default probability by the loan amount and by 57%, the share of a
-defaulted loan's amount charged off in the training years. Summed, that is $2.76B. The data's charge-off column sums to
-$5.66B for the same loans. In FY2003, the calibration year, the same method *over*-estimated (0.82×), so it doesn't
-create a gap by itself. Caveats: later years are inflated by the missing unfinished loans, and the lender's share is an
-approximation using each loan's guarantee percentage.
+**17. How was the 0.695 threshold set, and why from so few years?**
+Each of the three reference years was scored against the other two: FY2001 0.671, FY2002 0.586, FY2003 0.695. The
+threshold is the largest. Only three years are used because industry codes are missing for about half of loans before
+FY2001. Three is too few to call this a validated threshold; it is preliminary.
 
-**22. Show us one example your model gets wrong. Did you pick it to look good?**
-No. The rule is in the code: among the FY2006 defaults the model did not flag, take the one with the median predicted
-risk. It's a $165,000 franchise loan with a 75% guarantee, scored 12.6% (cut-off 17.0%), and it was charged off. Loans
-with that guarantee defaulted 11.8% in training and 30.4% in FY2006. The dashboard shows the same rule's examples for
-every year. No names or IDs are shown.
+**18. You report one false alarm in three normal years. Is that your false-alarm rate?**
+No, and I corrected that wording. Leaving each reference year out in turn flags FY2003, but with a "largest value"
+rule that check always flags exactly one year, whatever the data. The honest statement is that the false-alarm rate
+cannot be estimated from three years. Estimating it needs more normal years, which the newer SBA data would provide.
+
+**19. Did the alarm miss anything?**
+FY2004 had 1.21× the predicted defaults and no alarm. Under my rule (more than 1.25×) that is not deterioration; under
+a stricter rule it is a miss. FY2004's drift score was 0.677, and 0.677–0.694 under three other random seeds, against a
+0.695 line. So FY2004 was a close call that could have gone either way.
+
+**20. Is your alarm earlier than simply monitoring defaults?**
+Not in this data. A monitor that counts defaults already seen among loans approved two years earlier also first fired
+in FY2005. With a three-year lag it first fires in FY2006, but I report the two-year version because it is the harder
+comparison. I do not claim an earlier warning.
+
+**21. Then why would a bank bother with it?**
+Two practical reasons. It needs no repayment data, so it works for a new product or portfolio with no outcome history.
+And it says which application details changed, which tells the analyst where to look. Whether that is worth the false
+alarms is not something this study establishes.
+
+**22. Does drift mean higher risk?**
+No. Drift scores keep rising in FY2009–10 while recorded default rates fall. Part of the measured drift is SBA program
+and data-coding change, such as the end of the LowDoc program. Drift means the model is being used on unfamiliar
+applicants; whether that hurts has to be checked separately.
+
+**23. How do you know the drift is related to the model getting worse?**
+I only know they coincided in three judged years. That is an association in one dataset, not a causal finding.
+
+## Impact, fairness and deployment
+
+**24. Where do the dollar figures come from, and are they losses?**
+For each FY2004–07 loan: predicted probability × approved amount × 57% (the charged-off share of defaulted training
+loans), summed: $2.76B. The recorded charged-off principal for the same loans sums to $5.66B. These are gross
+charge-offs, before recoveries and shared between lenders and the SBA guarantee. They are not final losses. In the
+calibration year the same method over-estimated (0.82×), so it does not manufacture a gap.
+
+**25. Is it fair?**
+I cannot say. The data has no race, sex or age fields, and I do not infer them from names or places. The only group
+comparisons are descriptive: defaults were 2.69× predicted in Florida (17,547 loans) and 1.36× in Ohio (11,692).
+Region is confounded with the housing market. This is not a protected-group fairness audit.
+
+**26. Could a real bank use this today? What would be needed first?**
+No. It is a retrospective prototype. Before any use it would need: the bank's own data and model; many more reference
+periods to set and validate a threshold; a measured false-alarm rate; a test on at least one other downturn; a check
+that recalibrating after an alarm actually helps; and the bank's own model-risk governance.
+
+**27. What did you do, and what did Claude Code do?**
+Claude Code (Anthropic) helped develop and research the idea, wrote the code, ran the analysis and drafted the
+documentation and dashboard. I directed the work, made the decisions about what to pursue, repeatedly asked for audits that removed
+claims the evidence did not support (for example "early warning" and "proven leakage"), set up the repository and the
+published dashboard, recorded the demo, and studied the project so that I can explain each part. I did not write the
+modelling code myself.
+
+**28. What would you do with more time?**
+Run the same test on the SBA's newer loan-level data (FY2010 onward, including COVID) to see whether the alarm ever
+leads outcome-based monitoring and to estimate a false-alarm rate; then test whether recalibrating Model 1 after an
+alarm narrows the gap between predicted and observed defaults.

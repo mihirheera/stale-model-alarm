@@ -6,8 +6,8 @@ with the proper term second.
 ## The project in one breath
 Banks use AI to guess which small-business loans will go bad. That AI learns from old loans. When the world changes,
 the AI can quietly become wrong, and the bank only finds out years later when loans fail. We built a **second AI that
-notices when today's borrowers no longer look like the ones the first AI learned from**, and we tested it on the
-2008 financial crisis.
+notices when today's borrowers no longer look like the ones the first AI learned from**, and we tested it in hindsight
+on real SBA loans approved in the years before the 2008 financial crisis.
 
 ## 1. The ideas
 
@@ -65,7 +65,7 @@ while the borrowers look the same. So the alarm means "**review the model**", no
 ## 2. How we tested it fairly
 - **Time split.** Learn from FY2001–2002, tune on FY2003, then test each year from FY2004 to FY2010 separately. The
   model never sees the future.
-- **Alarm threshold set without the crisis.** We measured how different the normal years (2001, 2002, 2003) were from
+- **Alarm threshold set from normal years only.** We measured how different the normal years (2001, 2002, 2003) were from
   *each other*. The alarm fires only if a new year is more different than that. Nothing after 2003 was used.
 - **"Did the model really get worse?"** We decide this in hindsight, using how the loans actually turned out:
   deteriorated = more than 25% more defaults than expected, or AUC down by 0.05 or more.
@@ -81,19 +81,23 @@ while the borrowers look the same. So the alarm means "**review the model**", no
 - Its ranking stayed fairly stable (AUC 0.68 → 0.62), but its risk estimates were far too low: it expected 15–17.5%
   defaults while 18–43% happened.
 - The drift alarm was on in every year the model had deteriorated (2005, 2006, 2007) and off in 2004, without ever
-  using a default.
+  using a default. The simpler checks (PSI and counting early defaults) also first fired in 2005.
 - The detector says *what* changed: guarantee share, coding of credit lines, the end of the LowDoc program, loan size.
 
 **Does not show:**
 - That the alarm is *earlier* than watching early defaults. In this data both fired in FY2005.
 - That drift *caused* the defaults. Correlation in one crisis is not cause.
+- That the alarm line is reliable. It comes from only three reference years, so the false-alarm rate is unknown, and
+  FY2004 fell just under it.
+- That the loan-term field is a proven leak. It is a suspected recording problem; we removed it to be safe.
 - That this works for other banks, countries or decades. It is one case study.
 - Fairness for protected groups. The data has no demographic information.
 
 ## 3b. Two numbers judges will ask about
 **The dollar figure.** For each loan: model's default probability × loan amount × 57%, the share of a defaulted loan
-that was actually lost in 2001–02. Add these up and you get the losses the model "expected". For FY2004–07 that was
-$2.76B, while $5.66B was actually charged off. The lender's own part is the slice the SBA didn't guarantee. Sanity check:
+that was recorded as charged off in 2001–02. Add these up and you get the charge-offs the model "expected". For
+FY2004–07 that was $2.76B, while $5.66B was recorded as charged off. These are gross charge-offs: before any money
+recovered later, and split between the lender and the SBA guarantee. They are not final losses. Sanity check:
 in FY2003 the same sum came out *higher* than reality (0.82×), so the method isn't rigged to show a gap.
 
 **The example loan.** We didn't pick a loan that makes a good story. The rule: of all FY2006 defaults the model did
@@ -111,7 +115,7 @@ is a safety habit, like a smoke detector. It does not put out fires, but it tell
 |---|---|---|---|---|
 | `src/sma/config.py` | All settings: years, features, thresholds | One place to see and change every choice | – | constants |
 | `src/sma/data.py` | Loads the CSV, cleans it, builds features and the target | Raw data has dollar signs, 2-digit years, odd codes | `SBAnational.csv` | clean table |
-| `src/sma/audit.py` | Data checks: Term leak, outcome maturity, recording changes | Decides what we may trust before modelling | clean table | `results/audit.json`, `cohorts.csv` |
+| `src/sma/audit.py` | Data checks: suspicious Term field, outcome maturity, recording changes | Decides what we may trust before modelling | clean table | `results/audit.json`, `cohorts.csv` |
 | `src/sma/models.py` | AI model #1 + baselines, calibration, threshold | The thing being monitored | FY2001–03 loans | fitted models |
 | `src/sma/drift.py` | PSI and adversarial validation (AI model #2) | The alarm | two groups of applications | drift scores, top features |
 | `src/sma/evaluate.py` | AUC, precision, recall, Brier, calibration, bootstrap intervals | Honest scoring | true answers + predictions | metrics |

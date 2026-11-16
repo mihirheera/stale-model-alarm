@@ -26,6 +26,8 @@ data = {
     "ci": results["E4_models"]["Gradient boosting"]["by_year"],
     "label_monitor": results["label_monitor"]["lag2"]["by_monitor_year"],
     "label_threshold": results["label_monitor"]["lag2"]["threshold"],
+    "label_first_lag3": next((int(y) for y, v in results["label_monitor"]["lag3"]["by_monitor_year"].items() if v["alarm"]), None),
+    "seed_spread": results["E7_robustness"]["drift_seed_spread"],
     "term_leak": results["E7_robustness"]["term_leak_demo"],
     "config": results["config"],
     "impact": results["E9_financial_impact"],
