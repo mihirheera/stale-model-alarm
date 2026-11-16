@@ -5,7 +5,7 @@
 
 > This project is a prototype and is not financial advice.
 
-**[Live dashboard](https://mihirheera.github.io/stale-model-alarm/dashboard/index.html)** · [Full write-up](docs/full_writeup.md) (every detail, reproduction steps)
+**[Demo video (2 min)](https://youtu.be/Q_YpQ6imcLw)** · **[Live dashboard](https://mihirheera.github.io/stale-model-alarm/dashboard/index.html)** · [Full write-up](docs/full_writeup.md) (every detail, reproduction steps)
 
 **Main takeaway:** in a historical test on SBA small-business loans, a credit-risk model kept *ranking* borrowers
 better than simple rules while badly *under-estimating* how many would default. A second model, reading only
