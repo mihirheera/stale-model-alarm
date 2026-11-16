@@ -13,7 +13,7 @@ only shows up years later. So a model can pass every check its owner can run, wh
 no longer look like the ones it learned from. Under-estimated risk means the bank expects fewer charge-offs than it gets. It can also
 mean small businesses get loans priced for a world that no longer exists.
 
-## What we built
+## What I built
 A monitoring tool for a **credit-risk analyst at a community bank** doing a periodic model review.
 - **In:** one year's small-business loan applications (loan size, SBA guarantee share, employees, industry, state, ...).
 - **Out:** (1) a default-risk score for each loan, from AI model #1; and (2) a **drift status** for the year, from AI
@@ -24,8 +24,8 @@ A monitoring tool for a **credit-risk analyst at a community bank** doing a peri
 - It is a retrospective research prototype, not a deployed bank system.
 - It never approves or rejects a loan. It tells a person when to review the model.
 
-## What we added
-Our own idea. It is related to the brief's loan-model project (4.2.3), but it asks a different question: *can a credit
+## What I added
+My own idea. It is related to the brief's loan-model project (4.2.3), but it asks a different question: *can a credit
 model tell when it has gone stale, without waiting for loans to fail?* It uses its own dataset: 899,164 public SBA
 loans.
 
@@ -35,16 +35,16 @@ with 27 columns. Target: charged off (1) vs. paid in full (0). The 1,997 loans w
 treated as repaid. Only information known on approval day is used ([feature audit](feature_audit.md)). Every
 choice is in the [decision log](decision_log.md).
 
-**Data problems we found and handled.**
+**Data problems I found and handled.**
 1. **Loan term: suspected outcome contamination.** In fully matured cohorts (FY1990–2000, 254,890 loans), a "round"
    term (a multiple of 12 months) defaulted 0.8% of the time and an "odd" term 29.6%; exactly 84 months 0.3%, 83 months
-   10.3%. A contract length fixed on approval day should not behave like that. We could **not** establish the mechanism:
-   the recorded term matches the time to charge-off for only 4% of charged-off loans (correlation 0.05). Our hypothesis
-   is that the field was altered for some troubled loans, for example on restructuring. Because we cannot rule out that
+   10.3%. A contract length fixed on approval day should not behave like that. I could **not** establish the mechanism:
+   the recorded term matches the time to charge-off for only 4% of charged-off loans (correlation 0.05). My hypothesis
+   is that the field was altered for some troubled loans, for example on restructuring. Because I cannot rule out that
    it carries outcome information, `Term` is excluded as a precaution. With it, AUC is about 0.96; without it, about
    0.64. This is a suspected recording problem, not proven leakage.
 2. **Missing unfinished loans.** The file only includes loans whose outcome was known by 2014, so recent cohorts look
-   worse than they were. We judge only FY2004–2007, which have at least 7 years of follow-up. We also use official SBA
+   worse than they were. I judge only FY2004–2007, which have at least 7 years of follow-up. I also use official SBA
    approval counts as a conservative check.
 3. **Recording changes.** The industry code was missing for 41–57% of loans before FY2001, so training starts in FY2001.
 
@@ -75,7 +75,7 @@ All numbers are on years the models never trained on. Main model = gradient boos
 
 ![Actual vs predicted default rate](../results/figures/default_rates.png)
 
-**What we found**
+**What I found**
 - **The model beat both baselines in every judged year (FY2004–07)** on AUC, PR-AUC and Brier score. AUC was
   0.62–0.66, vs. 0.53–0.54 for the industry rule and 0.50 for the average-rate baseline. Its recall was slightly lower
   than the industry rule's in FY2004–06 because it flags fewer loans (table below). Logistic regression was close
@@ -101,8 +101,8 @@ All numbers are on years the models never trained on. Main model = gradient boos
 The model catches about as many defaults as the industry rule (slightly fewer in FY2004–06) while flagging fewer loans. It still misses
 about 4 in 10 defaults every year.
 
-**Dollar comparison (E9).** We turned the model's probabilities into dollars: P(default) × approved amount × the share
-of a defaulted loan's amount recorded as charged off in the training years (57%). We compared that with the principal
+**Dollar comparison (E9).** I turned the model's probabilities into dollars: P(default) × approved amount × the share
+of a defaulted loan's amount recorded as charged off in the training years (57%). I compared that with the principal
 recorded as charged off (`ChgOffPrinGr`). These are **gross charge-offs**: they are before any later recoveries, and
 they are shared between the lender and the SBA guarantee. They are not final economic losses.
 
@@ -124,14 +124,14 @@ loans still running in 2014, and the lender share uses each loan's guarantee per
 **One loan the model got wrong (E10).** Chosen by a fixed rule, not by hand: among all FY2006 defaults the model did
 not flag (10,613 of 26,517), the one with the median predicted risk. A new franchise business in "other services" in
 Massachusetts borrowed $165,000 with a 75% SBA guarantee and 3 employees. The model gave it **12.6%** risk, below the
-17.0% cut-off, so it was not flagged. It was charged off. *Why we think so:* in 2001–02, loans with a 75% guarantee
+17.0% cut-off, so it was not flagged. It was charged off. *Why I think so:* in 2001–02, loans with a 75% guarantee
 defaulted 11.8% of the time, the same as average. In FY2006 the same kind of loan defaulted 30.4%, while the model
 expected 14.8%. The model ranked this loan by a lesson that had stopped being true. The pattern is broad: 72% of
 FY2006's missed defaults had a 50% guarantee, matching their 71% share of all loans. These loans went from 31% of
 training loans (12.6% default) to 71% of FY2006 loans (37.0% default, while the model expected 18.0%). The model
 wasn't wrong about one group; it under-rated almost everyone. The dashboard shows the same rule's examples for every year.
 
-**Where it fails, and what we can't claim**
+**Where it fails, and what I can't claim**
 - **No lead time.** The simple label-based monitor also first fired in FY2005. In this data, the drift alarm was *as
   fast as* waiting for early defaults, not faster. Its advantages are that it needs no outcome data and that it explains
   what changed. That is retrospective monitoring evidence, not a proven early warning.
@@ -140,11 +140,11 @@ wasn't wrong about one group; it under-rated almost everyone. The dashboard show
   a "largest value" rule that check always flags exactly one year, so "1 in 3" is not a measured rate. FY2004 scored
   0.677 (0.677–0.694 under three other random seeds), just under the line: a close call.
 - **The tie with the label monitor depends on its lag.** With a two-year lag it first fires in FY2005; with a
-  three-year lag, FY2006. We report the two-year version, the harder comparison for our method.
+  three-year lag, FY2006. I report the two-year version, the harder comparison for my method.
 - **Missed mild deterioration.** FY2004 had 21% more defaults than expected, and the alarm stayed quiet. Under a stricter
   "deteriorated" rule (>10% more than expected), that counts as a miss.
 - **Drift is not failure, and not risk.** The drift score keeps rising in FY2009–10 while (incomplete) default rates fall.
-- **Group check (FY2004–07).** Under-prediction hit every group we could check, but unevenly. Florida loans defaulted at
+- **Group check (FY2004–07).** Under-prediction hit every group I could check, but unevenly. Florida loans defaulted at
   2.69× the expected rate and Ohio at 1.36×. In professional services and health care, the model flagged only 26% and
   15% of the loans that defaulted. These comparisons are descriptive: region and industry are confounded with the
   housing market and with loan type. The data has no demographic fields, so **this is not a protected-group fairness
@@ -153,7 +153,7 @@ wasn't wrong about one group; it under-rated almost everyone. The dashboard show
   to the 2008 financial crisis; loans approved during the crisis itself (FY2008–10) have incomplete outcomes. This is a
   retrospective case study of US SBA loans, not evidence of performance at a real bank.
 
-## What we'd do next
+## What I'd do next
 1. Test the same alarm on the SBA's newer loan-level data (FY2010–present, data.sba.gov), including the COVID shock, to
    see if it ever gives real lead time.
 2. Add economic indicators (e.g. state unemployment from FRED) and test whether *recalibrating* the model when the alarm

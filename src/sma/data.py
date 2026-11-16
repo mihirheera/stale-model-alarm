@@ -59,7 +59,7 @@ def _date(s: pd.Series) -> pd.Series:
 def _yes_no(s: pd.Series) -> pd.Series:
     """Y -> 'Y', N -> 'N', anything else (0, 1, T, C, S, blanks...) -> 'unknown'.
 
-    The paper (Li et al. 2018) says the other codes are data-entry errors, so we do not guess.
+    The paper (Li et al. 2018) says the other codes are data-entry errors, so I do not guess.
     """
     s = s.astype(str).str.strip().str.upper()
     return s.where(s.isin(["Y", "N"]), "unknown")

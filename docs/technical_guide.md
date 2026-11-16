@@ -5,8 +5,8 @@ with the proper term second.
 
 ## The project in one breath
 Banks use AI to guess which small-business loans will go bad. That AI learns from old loans. When the world changes,
-the AI can quietly become wrong, and the bank only finds out years later when loans fail. We built a **second AI that
-notices when today's borrowers no longer look like the ones the first AI learned from**, and we tested it in hindsight
+the AI can quietly become wrong, and the bank only finds out years later when loans fail. I built a **second AI that
+notices when today's borrowers no longer look like the ones the first AI learned from**, and I tested it in hindsight
 on real SBA loans approved in the years before the 2008 financial crisis.
 
 ## 1. The ideas
@@ -15,8 +15,8 @@ on real SBA loans approved in the years before the 2008 financial crisis.
 "this one defaulted") and it finds patterns that connect the details to the answer. Then it can guess the answer for
 new examples. "Supervised" means the answers were supplied during learning.
 
-**Classification.** A kind of supervised learning where the answer is a category: here, *default* or *repaid*. Our
-model outputs a probability ("23% chance of default"). Turning that into a yes/no flag needs a cut-off, which we
+**Classification.** A kind of supervised learning where the answer is a category: here, *default* or *repaid*. My
+model outputs a probability ("23% chance of default"). Turning that into a yes/no flag needs a cut-off, which I
 call the threshold.
 
 **How the default model learns (gradient boosting).** It builds hundreds of tiny decision trees, each a short
@@ -24,7 +24,7 @@ flowchart like "Is the loan over $150k? Is the business new?". Each new tree foc
 got most wrong. The final guess adds up all the trees. It is a strong, standard method for tables of data.
 **Logistic regression** is the simpler comparison: it gives each feature one weight, like a weighted checklist.
 
-**Baseline.** The dumbest reasonable guess, so we can see how much the AI adds. Ours: (a) give every loan the same
+**Baseline.** The dumbest reasonable guess, so I can see how much the AI adds. Mine: (a) give every loan the same
 risk, the training average; (b) look up the industry's past default rate.
 
 **ROC-AUC ("AUC").** Pick one loan that defaulted and one that was repaid at random. AUC is how often the model gave
@@ -39,7 +39,7 @@ defaults (recall up) but also flag more good loans (precision down).
 guesses, so it checks **both** ranking and whether the percentages are right.
 
 **Calibration.** Whether the percentages mean what they say. If the model says 15% for a group of loans and 15% of
-them default, it is calibrated. We report **actual ÷ expected**: 1.0 is perfect, and 2.0 means twice as many defaults
+them default, it is calibrated. I report **actual ÷ expected**: 1.0 is perfect, and 2.0 means twice as many defaults
 as the model expected. For a bank this matters a lot, because it decides how much money to hold back for losses.
 
 **Data drift.** The *inputs* change: this year's borrowers have different loan sizes, programs or industries than
@@ -52,7 +52,7 @@ feature into bins (for example 10 loan-size ranges), compare the share of loans 
 the differences in a particular way: PSI = Σ (now% − then%) × ln(now% / then%). 0 = identical. People often say above
 0.25 is a big shift. That is a habit, not a scientific law.
 
-**Adversarial validation (our drift detector).** Mix old applications (label "old") with this year's (label "new"),
+**Adversarial validation (my drift detector).** Mix old applications (label "old") with this year's (label "new"),
 hide the labels, and train a classifier to guess which is which. If it can't do better than a coin flip (AUC ≈ 0.5),
 the two groups look the same. If it can easily (AUC near 1), this year's borrowers look unlike anything the risk model
 learned from. **This is a machine-learning model itself**: it learns patterns across *all features at once*, which
@@ -62,15 +62,15 @@ PSI cannot. And it never sees whether loans defaulted.
 so a code changed, but borrowers are just as safe. And a model can fail with little drift, if the economy changes
 while the borrowers look the same. So the alarm means "**review the model**", not "**the model is broken**".
 
-## 2. How we tested it fairly
+## 2. How I tested it fairly
 - **Time split.** Learn from FY2001–2002, tune on FY2003, then test each year from FY2004 to FY2010 separately. The
   model never sees the future.
-- **Alarm threshold set from normal years only.** We measured how different the normal years (2001, 2002, 2003) were from
+- **Alarm threshold set from normal years only.** I measured how different the normal years (2001, 2002, 2003) were from
   *each other*. The alarm fires only if a new year is more different than that. Nothing after 2003 was used.
-- **"Did the model really get worse?"** We decide this in hindsight, using how the loans actually turned out:
+- **"Did the model really get worse?"** I decide this in hindsight, using how the loans actually turned out:
   deteriorated = more than 25% more defaults than expected, or AUC down by 0.05 or more.
 - **Compared with a simpler alarm.** A bank could also just count how many loans from 2 years ago have already
-  defaulted (the "label monitor"). Our alarm has to be at least as useful as that.
+  defaulted (the "label monitor"). My alarm has to be at least as useful as that.
 - **Robustness.** Other training windows, removing suspicious fields, changing thresholds, three random seeds: the
   conclusions did not change.
 
@@ -89,7 +89,7 @@ while the borrowers look the same. So the alarm means "**review the model**", no
 - That drift *caused* the defaults. Correlation in one crisis is not cause.
 - That the alarm line is reliable. It comes from only three reference years, so the false-alarm rate is unknown, and
   FY2004 fell just under it.
-- That the loan-term field is a proven leak. It is a suspected recording problem; we removed it to be safe.
+- That the loan-term field is a proven leak. It is a suspected recording problem; I removed it to be safe.
 - That this works for other banks, countries or decades. It is one case study.
 - Fairness for protected groups. The data has no demographic information.
 
@@ -100,7 +100,7 @@ FY2004–07 that was $2.76B, while $5.66B was recorded as charged off. These are
 recovered later, and split between the lender and the SBA guarantee. They are not final losses. Sanity check:
 in FY2003 the same sum came out *higher* than reality (0.82×), so the method isn't rigged to show a gap.
 
-**The example loan.** We didn't pick a loan that makes a good story. The rule: of all FY2006 defaults the model did
+**The example loan.** I didn't pick a loan that makes a good story. The rule: of all FY2006 defaults the model did
 *not* flag, take the one in the middle (median) of the model's risk scores. Same rule every year, and the code applies
 it.
 
@@ -115,7 +115,7 @@ is a safety habit, like a smoke detector. It does not put out fires, but it tell
 |---|---|---|---|---|
 | `src/sma/config.py` | All settings: years, features, thresholds | One place to see and change every choice | – | constants |
 | `src/sma/data.py` | Loads the CSV, cleans it, builds features and the target | Raw data has dollar signs, 2-digit years, odd codes | `SBAnational.csv` | clean table |
-| `src/sma/audit.py` | Data checks: suspicious Term field, outcome maturity, recording changes | Decides what we may trust before modelling | clean table | `results/audit.json`, `cohorts.csv` |
+| `src/sma/audit.py` | Data checks: suspicious Term field, outcome maturity, recording changes | Decides what I may trust before modelling | clean table | `results/audit.json`, `cohorts.csv` |
 | `src/sma/models.py` | AI model #1 + baselines, calibration, threshold | The thing being monitored | FY2001–03 loans | fitted models |
 | `src/sma/drift.py` | PSI and adversarial validation (AI model #2) | The alarm | two groups of applications | drift scores, top features |
 | `src/sma/evaluate.py` | AUC, precision, recall, Brier, calibration, bootstrap intervals | Honest scoring | true answers + predictions | metrics |
@@ -124,6 +124,6 @@ is a safety habit, like a smoke detector. It does not put out fires, but it tell
 | `dashboard/` | Interactive page built from results | Demo | results | `index.html` |
 | `tests/` | 13 automatic checks | Catches mistakes (e.g. a leak creeping back in) | – | pass/fail |
 
-**Bootstrap confidence interval.** We re-draw the test loans at random, with replacement, 200 times and recompute the
+**Bootstrap confidence interval.** I re-draw the test loans at random, with replacement, 200 times and recompute the
 metric each time. The middle 95% of the results is the interval. With 70,000 loans per year the intervals are narrow
 (about ±0.005 AUC), so the year-to-year changes are not noise. The bigger uncertainty is that there is only one crisis.

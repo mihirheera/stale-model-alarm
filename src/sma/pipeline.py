@@ -283,7 +283,7 @@ def e10_examples(df, models):
     """One real input -> output per year, chosen by a fixed rule (no hand-picking):
     the defaulted loan the model MISSED and the defaulted loan it CAUGHT whose predicted risk is closest to the
     median of that group. Business names, IDs, cities and banks are never included.
-    For the missed loan we also compare loans with the same SBA guarantee share in training vs. this year."""
+    For the missed loan I also compare loans with the same SBA guarantee share in training vs. this year."""
     m, thr = models[MAIN]
     train = df[df.fy.isin(config.TRAIN_YEARS)]
     out = {"threshold": thr, "by_year": {}}

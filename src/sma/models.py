@@ -64,7 +64,7 @@ def logistic_regression() -> Pipeline:
 
 
 def gradient_boosting() -> Pipeline:
-    """No class weights: we want honest probabilities, and the threshold handles the imbalance."""
+    """No class weights: I want honest probabilities, and the threshold handles the imbalance."""
     n_num = len(config.NUMERIC_FEATURES)
     pre = ColumnTransformer([
         ("num", "passthrough", config.NUMERIC_FEATURES),

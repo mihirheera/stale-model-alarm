@@ -6,7 +6,7 @@ bank would know it on that day. Definitions follow Li, Mickel & Taylor (2018), T
 | Raw column | Meaning | Known at approval? | Leakage risk | Decision | Why |
 |---|---|---|---|---|---|
 | LoanNr_ChkDgt | Loan ID | Yes | None, but meaningless | Remove | An identifier carries no risk information. |
-| Name | Borrower name | Yes | Privacy; could act as a proxy | Remove | Never used. We do not infer anything from names. |
+| Name | Borrower name | Yes | Privacy; could act as a proxy | Remove | Never used. I do not infer anything from names. |
 | City, Zip | Location | Yes | Very many values; privacy | Remove | Too fine-grained; `State` is kept instead. |
 | State | Borrower state | Yes | Low | **Keep** (`state`) | Regional economy matters. |
 | Bank | Lender name | Yes | High-cardinality ID | Remove | Would let the model memorise lenders. |

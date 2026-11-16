@@ -13,11 +13,11 @@ application forms, flagged the same years without any repayment data. It was not
 
 ## The problem
 A community bank's credit-risk analyst relies on a model trained on past loans, but whether a loan defaults is known
-only years later. The model can go out of date while the bank still trusts it. In our test years (FY2004–07), the
+only years later. The model can go out of date while the bank still trusts it. In my test years (FY2004–07), the
 model's probabilities implied about **$2.8B** of charge-offs; **$5.7B** of principal was recorded as charged off
 (gross figures, before recoveries and shared with the SBA guarantee, so not final losses).
 
-## What we built
+## What I built
 A model-review aid for that analyst. It is a retrospective prototype, not a deployed bank system.
 - **In:** a year's loan applications (amount, SBA guarantee share, employees, industry, state, ...).
 - **Out:** a default probability for each loan (Model 1), and a yearly **drift status** (Model 2): do applicants still
@@ -26,8 +26,8 @@ A model-review aid for that analyst. It is a retrospective prototype, not a depl
   a time with the status, the evidence behind it, real example loans and suggested analyst actions.
 - It never approves or rejects a loan. It gives a person a reason to review the model.
 
-## What we added
-Our own idea; not one of the suggested projects.
+## What I added
+My own idea; not one of the suggested projects.
 - **Question:** can a model's owner tell it is going stale *without waiting for loans to fail*?
 - **Two models:** a second classifier monitors the first, using application details only.
 - **Two kinds of baseline, tested chronologically:** prediction baselines for Model 1 (average rate, industry lookup)
@@ -88,7 +88,7 @@ Every figure is for years never used in training or calibration.
 - **Scope.** No demographic data, so this is not a fairness audit. One dataset, studied in hindsight: not evidence of
   how the method would perform at a real bank.
 
-## What we'd do next
+## What I'd do next
 1. Repeat the test on the SBA's newer data (FY2010 onward, including COVID) to see whether the alarm ever leads
    outcome-based monitoring, and to estimate a false-alarm rate.
 2. Test whether recalibrating Model 1 after an alarm narrows the gap between predicted and observed defaults.
