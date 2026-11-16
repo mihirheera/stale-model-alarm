@@ -5,7 +5,7 @@
 
 > This project is a prototype and is not financial advice.
 
-**[Demo video (2 min)](https://youtu.be/Q_YpQ6imcLw)** · **[Live dashboard](https://mihirheera.github.io/stale-model-alarm/dashboard/index.html)** · [Full write-up](docs/full_writeup.md) (every detail, reproduction steps)
+**[Demo video (2 min)](https://youtu.be/Q_YpQ6imcLw)** · **[Live dashboard](https://mihirheera.github.io/stale-model-alarm/dashboard/index.html)** · [Full write-up](docs/full_writeup.md) (every detail, reproduction steps) · [FAQ](docs/faq.md)
 
 **Main takeaway:** in a historical test on SBA small-business loans, a credit-risk model kept *ranking* borrowers
 better than simple rules while badly *under-estimating* how many would default. A second model, reading only
@@ -114,4 +114,4 @@ cd src && python -m sma.audit && python -m sma.pipeline && python -m sma.figures
 cd .. && python dashboard/build_dashboard.py && pytest -q    # 13 tests
 ```
 Code: `src/sma/` · results: `results/` · dashboard: `dashboard/` · docs: [full write-up](docs/full_writeup.md),
-[feature audit](docs/feature_audit.md), [decision log](docs/decision_log.md), [judge Q&A](docs/judge_qa.md).
+[feature audit](docs/feature_audit.md), [decision log](docs/decision_log.md), [FAQ](docs/faq.md).
